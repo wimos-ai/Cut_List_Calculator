@@ -200,6 +200,52 @@ namespace
 
         sources = std::vector<Source_s>(set.begin(), set.end());
     }
+
+    void validate_problem(const Problem &problem)
+    {
+        if (problem.sources.size() == 0)
+        {
+            throw problem_feasibility_exception("There are no sources available");
+        }
+        if (problem.cuts.size() == 0)
+        {
+            throw problem_feasibility_exception("There are no cuts available");
+        }
+
+        double max_src_len = -1;
+
+        for (auto &src : problem.sources)
+        {
+            if (src.length < 0)
+            {
+                throw problem_feasibility_exception("There is a source with a negitive length");
+            }
+            max_src_len = std::max(src.length, max_src_len);
+        }
+
+        double max_cut_len = -1;
+        for (auto &cut : problem.cuts)
+        {
+            if (cut.length < 0)
+            {
+                throw problem_feasibility_exception("There is a cut with a negitive length");
+            }
+            max_cut_len = std::max(cut.length, max_cut_len);
+        }
+
+        if (max_cut_len > max_src_len)
+        {
+            throw problem_feasibility_exception("There is a cut that is longer than the longest source");
+        }
+    }
+
+    void validate_problems(const Problems &problems)
+    {
+        for (const auto &problem : problems)
+        {
+            validate_problem(problem);
+        }
+    }
 }
 
 Problems parse_problems(const std::filesystem::path &json_file)
@@ -215,5 +261,9 @@ Problems parse_problems(const std::filesystem::path &json_file)
 
     sanitize_sources(sources);
 
-    return extract_problems(sources, cuts);
+    auto problems = extract_problems(sources, cuts);
+
+    validate_problems(problems);
+
+    return problems;
 }
