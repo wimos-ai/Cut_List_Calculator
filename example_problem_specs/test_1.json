@@ -1,0 +1,17 @@
+{
+    "sources": [
+        {
+            "tag": "2x4",
+            "name": "menards 2x4x8",
+            "cost": 3.46,
+            "length": 8
+        }
+    ],
+    "cuts": [
+        {
+            "tag": "2x4",
+            "length": 3,
+            "quantity": 8
+        }
+    ]
+}
