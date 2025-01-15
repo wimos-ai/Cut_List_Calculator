@@ -6,8 +6,14 @@
 
 struct Source
 {
-    double cost;
-    double length;
+    float cost;
+    float length;
+};
+
+struct Cut
+{
+    float length;
+    int quantity;
 };
 
 template <class T>
@@ -24,8 +30,21 @@ namespace std
     {
         inline size_t operator()(const Source &x) const
         {
-            size_t a = std::hash<double>{}(x.cost);
-            hash_combine<double>(a, x.length);
+            size_t a = 729379812793;
+            hash_combine(a, x.length);
+            hash_combine(a, x.cost);
+            return a;
+        }
+    };
+
+    template <>
+    struct hash<Cut>
+    {
+        inline size_t operator()(const Cut &x) const
+        {
+            size_t a = 16298391286;
+            hash_combine(a, x.quantity);
+            hash_combine(a, x.length);
             return a;
         }
     };
@@ -40,12 +59,6 @@ namespace std
     };
 }
 
-struct Cut
-{
-    double length;
-    int quantity;
-};
-
 struct Problem
 {
     std::string tag;
@@ -54,10 +67,10 @@ struct Problem
     std::vector<Cut> cuts;
 };
 
-void output(std::ostream& out, const Source& src, const std::string& name);
+void output(std::ostream &out, const Source &src, const std::string &name);
 
-std::ostream& operator<<(std::ostream& out, const Problem& problem);
+std::ostream &operator<<(std::ostream &out, const Problem &problem);
 
-std::ostream& operator<<(std::ostream& out, const Cut& cut);
+std::ostream &operator<<(std::ostream &out, const Cut &cut);
 
 using Problems = std::vector<Problem>;

@@ -212,7 +212,7 @@ namespace
             throw problem_feasibility_exception("There are no cuts available");
         }
 
-        double max_src_len = -1;
+        float max_src_len = -1;
 
         for (auto &src : problem.sources)
         {
@@ -223,7 +223,7 @@ namespace
             max_src_len = std::max(src.length, max_src_len);
         }
 
-        double max_cut_len = -1;
+        float max_cut_len = -1;
         for (auto &cut : problem.cuts)
         {
             if (cut.length < 0)
