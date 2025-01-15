@@ -50,11 +50,57 @@ namespace std
     };
 
     template <>
+    struct hash<std::vector<Cut>>
+    {
+        size_t operator()(const std::vector<Cut> &vec) const
+        {
+            size_t seed = 6875769686;
+            for (const auto &cut : vec)
+            {
+                hash_combine(seed, cut);
+            }
+            return seed;
+        }
+    };
+
+    template <>
     struct equal_to<Source>
     {
-        inline bool operator()(const Source &a, const Source &b) const
+        constexpr bool operator()(const Source &a, const Source &b) const
         {
             return a.cost == b.cost && a.length == b.length;
+        }
+    };
+
+    template <>
+    struct equal_to<Cut>
+    {
+        constexpr bool operator()(const Cut &a, const Cut &b) const
+        {
+            return a.quantity == b.quantity && a.length == b.length;
+        }
+    };
+
+    template <>
+    struct equal_to<std::vector<Cut>>
+    {
+        bool operator()(const std::vector<Cut> &a, const std::vector<Cut> &b) const
+        {
+            if (a.size() != b.size())
+            {
+                return false;
+            }
+
+            for (size_t i = 0; i < a.size(); i++)
+            {
+                std::equal_to<Cut> cmp;
+                if (!(cmp(a[i], b[i])))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     };
 }
