@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Specify the source file(s)
-set(SOURCES src/main.cpp src/cut_optimization_solver.cpp src/json_problem_parser.cpp)
+set(SOURCES src/main.cpp src/cut_optimization_solver.cpp src/json_problem_parser.cpp src/types.cpp)
 
 # Add Nlohmann JSON as an external library
 include(FetchContent)

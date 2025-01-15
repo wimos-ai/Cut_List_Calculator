@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <iostream>
 #include <unordered_map>
 
 struct Source
@@ -10,10 +11,10 @@ struct Source
 };
 
 template <class T>
-inline void hash_combine(std::size_t& seed, const T& v)
+inline void hash_combine(std::size_t &seed, const T &v)
 {
     std::hash<T> hasher;
-    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 namespace std
@@ -21,7 +22,7 @@ namespace std
     template <>
     struct hash<Source>
     {
-        size_t operator()(const Source &x) const
+        inline size_t operator()(const Source &x) const
         {
             size_t a = std::hash<double>{}(x.cost);
             hash_combine<double>(a, x.length);
@@ -29,9 +30,11 @@ namespace std
         }
     };
 
-    template<>
-    struct equal_to<Source>{
-        bool operator()(const Source& a, const Source& b) const {
+    template <>
+    struct equal_to<Source>
+    {
+        inline bool operator()(const Source &a, const Source &b) const
+        {
             return a.cost == b.cost && a.length == b.length;
         }
     };
@@ -50,5 +53,11 @@ struct Problem
     std::vector<Source> sources;
     std::vector<Cut> cuts;
 };
+
+void output(std::ostream& out, const Source& src, const std::string& name);
+
+std::ostream& operator<<(std::ostream& out, const Problem& problem);
+
+std::ostream& operator<<(std::ostream& out, const Cut& cut);
 
 using Problems = std::vector<Problem>;

@@ -248,14 +248,12 @@ namespace
     }
 }
 
-Problems parse_problems(const std::filesystem::path &json_file)
+Problems parse_problems(const std::string &str)
 {
-    std::string contents = read_file(json_file);
-
     std::vector<Source_s> sources;
     std::vector<Cut_s> cuts;
 
-    parseJSON(contents, sources, cuts);
+    parseJSON(str, sources, cuts);
 
     sanitize_cuts(cuts);
 
@@ -266,4 +264,10 @@ Problems parse_problems(const std::filesystem::path &json_file)
     validate_problems(problems);
 
     return problems;
+}
+
+Problems parse_problems(const std::filesystem::path &json_file)
+{
+    std::string contents = read_file(json_file);
+    return parse_problems(contents);
 }
