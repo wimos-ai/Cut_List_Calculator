@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
+#include <bit>
 
 struct Source
 {
@@ -30,10 +31,17 @@ namespace std
     {
         inline size_t operator()(const Source &x) const
         {
-            size_t a = 729379812793;
-            hash_combine(a, x.length);
-            hash_combine(a, x.cost);
-            return a;
+            if constexpr (std::is_trivially_copyable_v<Source> && sizeof(Source) == sizeof(size_t))
+            {
+                return std::bit_cast<size_t>(x);
+            }
+            else
+            {
+                size_t seed = 729379812793; // Arbitrary starting seed
+                hash_combine(seed, std::hash<decltype(x.length)>{}(x.length));
+                hash_combine(seed, std::hash<decltype(x.cost)>{}(x.cost));
+                return seed;
+            }
         }
     };
 
@@ -42,10 +50,17 @@ namespace std
     {
         inline size_t operator()(const Cut &x) const
         {
-            size_t a = 16298391286;
-            hash_combine(a, x.quantity);
-            hash_combine(a, x.length);
-            return a;
+            if constexpr (std::is_trivially_copyable_v<Cut> && sizeof(Cut) == sizeof(size_t))
+            {
+                return std::bit_cast<size_t>(x);
+            }
+            else
+            {
+                size_t a = 16298391286;
+                hash_combine(a, x.quantity);
+                hash_combine(a, x.length);
+                return a;
+            }
         }
     };
 
@@ -119,8 +134,8 @@ std::ostream &operator<<(std::ostream &out, const Problem &problem);
 
 std::ostream &operator<<(std::ostream &out, const Cut &cut);
 
-std::ostream& operator<<(std::ostream& out, const Source& src);
+std::ostream &operator<<(std::ostream &out, const Source &src);
 
 using Problems = std::vector<Problem>;
 
-std::ostream& operator<<(std::ostream& out, const Problems& problems);
+std::ostream &operator<<(std::ostream &out, const Problems &problems);
