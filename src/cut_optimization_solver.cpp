@@ -282,9 +282,15 @@ void output(std::ostream &out, const Problem &problem, const EndState &solution)
         it->second++;
     }
 
-    out << "\n";
     out << "For: " << problem.tag << ", Cost: " << solution.cost << '\n';
-    for (const auto &item : block_count)
+
+    std::vector<std::pair<CutBlock, size_t>> items{block_count.begin(), block_count.end()};
+
+    std::sort(items.begin(), items.end(),[](const std::pair<CutBlock, size_t>& a, const std::pair<CutBlock, size_t>& b){
+        return a.first.source_length < b.first.source_length;
+    });
+
+    for (const auto &item : items)
     {
         out << "\t(" << item.second << "x) [" << item.first.source_name << ", " << item.first.source_length << "] -> [";
         for (size_t i = 0; i < item.first.cut_lengths.size(); i++)
