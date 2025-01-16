@@ -7,18 +7,21 @@
 
 #include "types.hpp"
 #include "json_problem_parser.hpp"
+#include "cut_optimization_solver.hpp"
 
 int main()
 {
     std::filesystem::path example1 = "/home/jacobmosier/Cut_List_Calculator/example_problem_specs/test_1.json";
 
-    auto problems = parse_problems(example1);
+    Problems problems = parse_problems(example1);
 
-    for (const auto &problem : problems)
+    std::cout << "Problems: " << problems << std::endl;
+
+    for (auto &problem : problems)
     {
-        std::cout << problem << '\n';
+        EndState solution = solve_cut_problem(problem.sources, problem.cuts);
+        std::cout << solution << std::endl;
     }
-    std::cout << std::endl;
 
     return 0;
 }

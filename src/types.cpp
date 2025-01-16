@@ -10,6 +10,14 @@ void output(std::ostream &out, const Source &src, const std::string &name)
     out << json_tag(length) << src.length << "\n}";
 }
 
+std::ostream &operator<<(std::ostream &out, const Source &src)
+{
+    out << '{';
+    out << json_tag(cost) << src.cost << ",\n";
+    out << json_tag(length) << src.length << "\n}";
+    return out;
+}
+
 std::ostream &operator<<(std::ostream &out, const Cut &cut)
 {
     out << '{';
@@ -48,5 +56,20 @@ std::ostream &operator<<(std::ostream &out, const Problem &problem)
     }
     out << "]}\n";
 
+    return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const Problems &problems)
+{
+    out << '[';
+    for (size_t i = 0; i < problems.size(); i++)
+    {
+        out << problems[i];
+        if (i != problems.size() - 1)
+        {
+            out << ',';
+        }
+        out << '\n';
+    }
     return out;
 }

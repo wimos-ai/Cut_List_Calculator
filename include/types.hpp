@@ -119,4 +119,8 @@ std::ostream &operator<<(std::ostream &out, const Problem &problem);
 
 std::ostream &operator<<(std::ostream &out, const Cut &cut);
 
+std::ostream& operator<<(std::ostream& out, const Source& src);
+
 using Problems = std::vector<Problem>;
+
+std::ostream& operator<<(std::ostream& out, const Problems& problems);
