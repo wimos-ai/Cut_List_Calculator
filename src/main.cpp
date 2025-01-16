@@ -20,7 +20,8 @@ int main()
     for (auto &problem : problems)
     {
         EndState solution = solve_cut_problem(problem.sources, problem.cuts);
-        std::cout << solution << std::endl;
+        // std::cout << solution;
+        output(std::cout, problem, solution);
     }
 
     return 0;

@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <queue>
+#include <functional>
 
 Record operator+(const Record &a, const Record &b)
 {
@@ -47,7 +48,7 @@ std::ostream &operator<<(std::ostream &out, const Operation &operation)
     }
     else if (const Source *src_ = std::get_if<Source>(&operation))
     {
-        const Source& src = *src_;
+        const Source &src = *src_;
         out << src;
     }
     else
@@ -61,6 +62,7 @@ std::ostream &operator<<(std::ostream &out, const EndState &state)
 {
     out << "{\"cost\": " << state.cost << ",\n";
     out << "\"operations\": " << state.operations;
+    out << '}';
     return out;
 }
 
@@ -177,4 +179,122 @@ EndState solve_cut_problem(std::vector<Source> &sources, std::vector<Cut> &cuts)
     std::sort(sources.begin(), sources.end(), SourceLengthSorter());
     CutSolver solver(sources);
     return solver.solve(cuts);
+}
+
+namespace
+{
+    struct CutBlock
+    {
+        std::string source_name;
+        float source_length;
+        std::vector<float> cut_lengths;
+    };
+
+};
+
+namespace std
+{
+    template <>
+    struct hash<CutBlock>
+    {
+        size_t operator()(const CutBlock &block) const
+        {
+            size_t a = 98230981;
+            hash_combine(a, block.source_name);
+            hash_combine(a, block.source_length);
+            for (size_t i = 0; i < block.cut_lengths.size(); i++)
+            {
+                hash_combine(a, block.cut_lengths[i]);
+            }
+            return a;
+        }
+    };
+
+    template <>
+    struct equal_to<CutBlock>
+    {
+        bool operator()(const CutBlock &a, const CutBlock &b) const
+        {
+            if (a.source_length != b.source_length || a.cut_lengths.size() != b.cut_lengths.size() || b.source_name != a.source_name)
+            {
+                return false;
+            }
+            for (size_t i = 0; i < a.cut_lengths.size(); i++)
+            {
+                if (a.cut_lengths[i] != b.cut_lengths[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+}
+
+void output(std::ostream &out, const Problem &problem, const EndState &solution)
+{
+    const auto vec = solution.operations.c;
+
+    std::reference_wrapper<const Source> curr_src = std::get<Source>(vec[0]);
+
+    CutBlock curr_block;
+
+    curr_block.source_length = curr_src.get().length;
+    curr_block.source_name = problem.source_names.find(curr_src.get())->second;
+
+    std::unordered_map<CutBlock, size_t> block_count;
+
+    for (size_t i = 1; i < vec.size(); i++)
+    {
+        if (vec[i].index() == 0) // Cut
+        {
+            curr_block.cut_lengths.emplace_back(std::get<Cut>(vec[i]).length);
+        }
+        else
+        {
+            // Increment count for the block
+            auto it = block_count.find(curr_block);
+            if (it == block_count.end())
+            {
+                block_count[curr_block] = 1;
+            }
+            else
+            {
+                it->second++;
+            }
+
+            // Set block to new source
+            curr_src = std::get<Source>(vec[i]);
+            curr_block.source_length = curr_src.get().length;
+            curr_block.source_name = problem.source_names.find(curr_src.get())->second;
+            curr_block.cut_lengths.clear();
+        }
+    }
+
+    // Increment count for the last block because there is no source to end it on
+    auto it = block_count.find(curr_block);
+    if (it == block_count.end())
+    {
+        block_count[curr_block] = 1;
+    }
+    else
+    {
+        it->second++;
+    }
+
+    out << "\n";
+    out << "For: " << problem.tag << ", Cost: " << solution.cost << '\n';
+    for (const auto &item : block_count)
+    {
+        out << "\t(" << item.second << "x) [" << item.first.source_name << ", " << item.first.source_length << "] -> [";
+        for (size_t i = 0; i < item.first.cut_lengths.size(); i++)
+        {
+            out << item.first.cut_lengths[i];
+            if (i != item.first.cut_lengths.size() - 1)
+            {
+                out << ", ";
+            }
+        }
+        out << "]\n";
+    }
 }
