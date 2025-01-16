@@ -150,7 +150,7 @@ namespace
                 {
                     for (size_t i = 0; i < state.cuts.size(); i++)
                     {
-                        if (state.cuts[i].length < state.length && state.cuts[i].quantity != 0)
+                        if (state.cuts[i].length <= state.length && state.cuts[i].quantity != 0)
                         {
                             State cpy = state;
                             cpy.length -= state.cuts[i].length;

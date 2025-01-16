@@ -11,7 +11,7 @@
 
 int main()
 {
-    std::filesystem::path example1 = "/home/jacobmosier/Cut_List_Calculator/example_problem_specs/test_1.json";
+    std::filesystem::path example1 = "/home/jacobmosier/Cut_List_Calculator/example_problem_specs/test_2.json";
 
     Problems problems = parse_problems(example1);
 
